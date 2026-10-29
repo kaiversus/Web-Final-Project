@@ -1,0 +1,72 @@
+package com.iot.management.security;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
+    private final JwtTokenProvider tokenProvider;
+    private final CustomUserDetailsService customUserDetailsService;
+
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, CustomUserDetailsService customUserDetailsService) {
+        this.tokenProvider = tokenProvider;
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String jwt = getJwtFromRequest(request);
+
+            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+                String username = tokenProvider.getUsernameFromJWT(jwt);
+
+                CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(username);
+                if (!userDetails.isEnabled() || !userDetails.isAccountNonLocked()
+                    || !tokenProvider.matchesVersion(jwt, userDetails.getUser().getTokenVersion())) {
+                    filterChain.doFilter(request, response); return;
+                }
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception ex) {
+            log.error("Could not set user authentication in security context", ex);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String getJwtFromRequest(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer ")) {
+            return authorization.substring(7);
+        }
+        if (request.getCookies() != null) {
+            for (javax.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("jwt_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+}

@@ -1,0 +1,12 @@
+*
+!/.gitignore
+!/pom.xml
+!/src/
+!/src/main/
+!/src/main/**
+!/src/test/
+!/src/test/**
+**/target/
+**/build/
+**/*.class
+**/*.log

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Trang chủ')}"></head><body>
+<header th:replace="~{fragments/layout :: header}"></header><main class="container">
+<section class="hero row g-5 align-items-center">
+    <div class="col-lg-7"><div class="eyebrow mb-3">THIẾT BỊ CỦA BẠN. TRONG TẦM TAY.</div>
+        <h1>Một nơi cho mọi thiết bị IoT.</h1><p class="lead text-muted my-4">Tổ chức danh sách, cập nhật thông tin và quản lý hình ảnh thiết bị. Rõ ràng, thuận tiện, ở bất cứ đâu.</p>
+        <div class="d-flex gap-3 flex-wrap"><a sec:authorize="isAuthenticated()" class="btn btn-primary" th:href="@{/devices}">Quản lý thiết bị →</a><a sec:authorize="!isAuthenticated()" class="btn btn-primary" th:href="@{/register}">Bắt đầu sử dụng →</a><a sec:authorize="!isAuthenticated()" class="btn btn-outline-primary" th:href="@{/login}">Đăng nhập</a></div>
+    </div>
+    <div class="col-lg-5"><div class="hero-visual"><div class="hero-device"><div class="eyebrow mb-3">KHÔNG GIAN KẾT NỐI</div><div class="d-flex align-items-center gap-3"><span class="device-thumb device-placeholder" aria-hidden="true">◈</span><div><h2 class="h5 mb-1">Quản lý tập trung</h2><span class="small text-muted">Thông tin · Danh mục · Hình ảnh</span></div></div><hr><p class="small text-muted mb-0">Mỗi thiết bị có một hồ sơ riêng, giúp bạn dễ dàng tra cứu và cập nhật.</p></div></div></div>
+</section>
+<section class="row g-4 mb-4" aria-label="Tính năng">
+    <div class="col-md-4"><div class="panel h-100"><span class="feature-number">01 / THIẾT BỊ</span><h2 class="h5 mt-3">Thông tin luôn ngăn nắp</h2><p class="text-muted mb-0">Thêm, chỉnh sửa và phân loại thiết bị theo nhu cầu của bạn.</p></div></div>
+    <div class="col-md-4"><div class="panel h-100"><span class="feature-number">02 / TÌM KIẾM</span><h2 class="h5 mt-3">Tìm đúng thiết bị</h2><p class="text-muted mb-0">Tra cứu theo tên, mã thiết bị, danh mục và trạng thái.</p></div></div>
+    <div class="col-md-4"><div class="panel h-100"><span class="feature-number">03 / HÌNH ẢNH</span><h2 class="h5 mt-3">Nhận diện trực quan</h2><p class="text-muted mb-0">Thêm hình ảnh để nhận ra thiết bị ngay trong danh sách.</p></div></div>
+</section></main><footer th:replace="~{fragments/layout :: footer}"></footer><th:block th:replace="~{fragments/layout :: scripts}"></th:block></body></html>
